@@ -1,0 +1,108 @@
+<html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org" lang="zh-CN">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+    <title>Video.js</title>
+    <link th:href="@{/static/video.js/dist/video-js.min.css}" rel="stylesheet">
+    <script th:src='@{/static/video.js/dist/video.min.js}'></script>
+    <script th:src='@{/static/video.js/dist/videojs-contrib-hls.min.js}'></script>
+    <script th:src='@{/static/jquery/dist/jquery.min.js}'></script>
+    <style>
+        body,html{
+            height: 100%;
+            width: 100%;
+            margin: 0;
+            padding: 0;
+        }
+        div#my-video {
+            width: 100%;
+            height: 100%;
+        }
+    </style>
+</head>
+
+<body>
+<video id="my-video" class="video-js vjs-default-skin vjs-big-play-centered" controls preload="auto"
+       poster="https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1603779703040&di=a72fa3967ed668bb44be4458e280b90f&imgtype=0&src=http%3A%2F%2Fi.vzan.cc%2Ftemp%2Fimage%2Fpng%2F2018%2F1%2F4%2F110327cdbc15c32e5f4a22b163e615b66779fc.png"
+       data-setup="{}">
+</video>
+
+<script type="text/javascript">
+    window.onload = function (){
+        var orderNo = GetQueryValue('orderNo');
+        var deviceId = GetQueryValue('deviceId');
+        GetHls(orderNo,deviceId).then(function (res){
+            // 初始化视频，设为全局变量
+            var myPlayer = videojs('my-video', {
+                autoplay: true,
+                muted: false, // 静音
+                preload: "auto", // 预加载
+                language: "zh-CN", // 初始化语言
+                playbackRates: [1,2,4,6], // 播放速度
+                techOrder: ['html5', 'flash'],
+            }, function () {
+                myPlayer.one("playing", function () { // 监听播放
+                    console.log("开始播放");
+                });
+                myPlayer.one("error", function (error) { // 监听错误
+                    console.error("监听到异常，错误信息：%o", error);
+                });
+            });
+            //不支持flash
+            myPlayer.src([{
+                src: res
+            }]);
+        })
+
+    }
+
+    /**
+     * [通过参数名获取url中的参数值]
+     * 示例URL:http://htmlJsTest/getrequest.html?uid=admin&rid=1&fid=2&name=小明
+     * @param  {[string]} queryName [参数名]
+     * @return {[string]}           [参数值]
+     */
+    function GetQueryValue(queryName) {
+        var query = decodeURI(window.location.search.substring(1));
+        var vars = query.split("&");
+        for (var i = 0; i < vars.length; i++) {
+            var pair = vars[i].split("=");
+            if (pair[0] == queryName) { return pair[1]; }
+        }
+        return null;
+    }
+
+    /**
+     * 获取媒体流
+     * @constructor
+     */
+    function GetHls(orderNo,deviceId){
+        return new Promise(function(resolve, reject) {
+            $.ajax({
+                type : "POST",
+                url : "/sms/core/GetHls",
+                async: false,
+                data : {
+                    orderNo:orderNo,
+                    deviceId:deviceId
+                },
+                success : function(result) {
+                    if(result.data.indexOf('http') != -1){
+                        resolve(result.data);
+                        return ;
+                    }
+                    reject(null);
+                },
+                error : function(e){
+                    alert('请求失败')
+                    reject(null);
+                }
+            });
+        });
+
+    }
+</script>
+</body>
+
+</html>
