@@ -7,6 +7,10 @@ public class Deviclist {
 
     private Integer luserid;
 
+    private Integer sessionid;
+
+    private Integer previewhandle;
+
     private String orderno;
 
     private String videopath;
@@ -16,6 +20,10 @@ public class Deviclist {
     private String addtime;
 
     private Integer pid;
+
+    private Integer isrunmp4;
+
+    private Integer isrunstream;
 
     public Integer getId() {
         return id;
@@ -39,6 +47,22 @@ public class Deviclist {
 
     public void setLuserid(Integer luserid) {
         this.luserid = luserid;
+    }
+
+    public Integer getSessionid() {
+        return sessionid;
+    }
+
+    public void setSessionid(Integer sessionid) {
+        this.sessionid = sessionid;
+    }
+
+    public Integer getPreviewhandle() {
+        return previewhandle;
+    }
+
+    public void setPreviewhandle(Integer previewhandle) {
+        this.previewhandle = previewhandle;
     }
 
     public String getOrderno() {
@@ -79,5 +103,21 @@ public class Deviclist {
 
     public void setPid(Integer pid) {
         this.pid = pid;
+    }
+
+    public Integer getIsrunmp4() {
+        return isrunmp4;
+    }
+
+    public void setIsrunmp4(Integer isrunmp4) {
+        this.isrunmp4 = isrunmp4;
+    }
+
+    public Integer getIsrunstream() {
+        return isrunstream;
+    }
+
+    public void setIsrunstream(Integer isrunstream) {
+        this.isrunstream = isrunstream;
     }
 }

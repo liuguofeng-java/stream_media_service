@@ -1,17 +1,13 @@
 package com.model.ffmepg.task.bean;
 
-import com.model.dao.impl.DeviclistImpl;
 import com.model.ffmepg.operation.FFOperationBase;
 import com.model.ffmepg.task.context.FFTaskContext;
 import com.model.ffmepg.util.FFTerminalCreater;
 import com.model.ffmepg.util.UUIDUtil;
-import com.model.pojo.Deviclist;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Bean;
+import lombok.SneakyThrows;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
-import java.util.Date;
 
 /**
  * 任务父类
@@ -49,8 +45,10 @@ public abstract class FFTask<T extends FFOperationBase> implements Runnable {
      */
     private FFTerminalCreater.FFTerminal terminal = null;
 
+    @SneakyThrows
     @Override
     public void run() {
+        System.out.println("====任务开始====");
         //任务开始
         progress.setState(FFTaskStateEnum.START);
 
@@ -88,6 +86,7 @@ public abstract class FFTask<T extends FFOperationBase> implements Runnable {
         FFTaskContext.getContext().removeTask(this.getTaskId());
         //执行结束回调
         callExecEnd();
+        System.out.println("====任务结束"+pid+"====");
     }
 
 
@@ -111,7 +110,7 @@ public abstract class FFTask<T extends FFOperationBase> implements Runnable {
     /**
      * 删除流
      */
-    public abstract void removeStream(long pid);
+    public abstract void removeStream(long pid) throws InterruptedException;
 
 
     public FFTask(){

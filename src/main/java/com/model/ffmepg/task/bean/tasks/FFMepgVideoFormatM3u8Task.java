@@ -57,13 +57,16 @@ public class FFMepgVideoFormatM3u8Task extends FFVideoTask<FFMpegVideoFormatM3u8
     public void removeStream(long pid) {
         DeviclistImpl deviclistImpl = applicationContext.getBean(DeviclistImpl.class);
         try{
+            Thread.sleep(1000);
             if(pid != -1){
-                Deviclist d = deviclistImpl.queryPid(pid);
-                if(d != null){
-                    d.setPid(null);
-                    d.setStreampath(null);
-                    d.setStreampath(null);
-                    deviclistImpl.updateDeviclist(d);
+                Deviclist device = deviclistImpl.queryPid(pid);
+                System.out.println("pid"+pid);
+                System.out.println(device);
+                if(device != null){
+                    device.setPid(null);
+                    device.setStreampath(null);
+                    device.setStreampath(null);
+                    deviclistImpl.updateDeviclist(device);
                     log.info("进程结束pid:" + pid);
                 }
             }

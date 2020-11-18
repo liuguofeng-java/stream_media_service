@@ -43,16 +43,12 @@ public class DeviclistImpl implements DeviclistDao {
     }
 
     @Override
-    public Deviclist queryDevicDevicId(String devicId) {
+    public List<Deviclist> queryDevicDevicId(String devicId) {
         DeviclistExample example = new DeviclistExample();
         DeviclistExample.Criteria criteria = example.createCriteria();
         criteria.andDevicidEqualTo(devicId);
         List<Deviclist> deviclists = deviclistMapper.selectByExample(example);
-        if(deviclists.size() == 0){
-            return null;
-        }else {
-            return deviclists.get(0);
-        }
+        return deviclists;
     }
 
     @Override
@@ -65,18 +61,9 @@ public class DeviclistImpl implements DeviclistDao {
     public boolean updateDeviclist(Deviclist deviclist) {
         DeviclistExample example = new DeviclistExample();
         DeviclistExample.Criteria criteria = example.createCriteria();
-        criteria.andDevicidEqualTo(deviclist.getDevicid());
+        criteria.andIdEqualTo(deviclist.getId());
         int i = deviclistMapper.updateByExample(deviclist,example);
         return i > 0;
-    }
-
-    @Override
-    public String queryOrderNoAndStreamPathNotNull(String orderNo) {
-        Deviclist devic = queryDeviclistOrderNo(orderNo);
-        if(devic != null && devic.getStreampath() != null){
-            return devic.getStreampath();
-        }
-        return null;
     }
 
     @Override

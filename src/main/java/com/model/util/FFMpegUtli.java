@@ -1,7 +1,6 @@
 package com.model.util;
 
 import com.model.config.StreamMediaConfig;
-import com.model.dao.impl.DeviclistImpl;
 import com.model.ffmepg.operation.ffmpeg.vidoe.FFMpegVideoFormatM3u8;
 import com.model.ffmepg.operation.ffmpeg.vidoe.FFMpegVideoInfo;
 import com.model.ffmepg.result.defaultResult.FFVideoInfoResult;
@@ -12,7 +11,6 @@ import com.model.ffmepg.task.context.FFTaskContext;
 import com.model.ffmepg.util.FFTerminalCreater;
 import com.model.pojo.Deviclist;
 import lombok.extern.log4j.Log4j2;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 

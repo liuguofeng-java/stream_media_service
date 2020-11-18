@@ -5,16 +5,16 @@
     <id column="Id" property="id" jdbcType="INTEGER" />
     <result column="DevicId" property="devicid" jdbcType="VARCHAR" />
     <result column="LuserID" property="luserid" jdbcType="INTEGER" />
+    <result column="SessionId" property="sessionid" jdbcType="INTEGER" />
+    <result column="PreviewHandle" property="previewhandle" jdbcType="INTEGER" />
     <result column="OrderNo" property="orderno" jdbcType="VARCHAR" />
     <result column="VideoPath" property="videopath" jdbcType="VARCHAR" />
     <result column="StreamPath" property="streampath" jdbcType="VARCHAR" />
     <result column="AddTime" property="addtime" jdbcType="VARCHAR" />
     <result column="Pid" property="pid" jdbcType="INTEGER" />
+    <result column="IsRunMp4" property="isrunmp4" jdbcType="INTEGER" />
+    <result column="IsRunStream" property="isrunstream" jdbcType="INTEGER" />
   </resultMap>
-
-  <update id="updateDeviclist" parameterType="java.lang.String">
-    update devicList set StreamPath=#{streamPath} where OrderNo=#{orderNo}
-  </update>
 
   <delete id="decdeleteTable">
     delete from devicList
@@ -79,7 +79,8 @@
     </where>
   </sql>
   <sql id="Base_Column_List" >
-    Id, DevicId, LuserID, OrderNo, VideoPath, StreamPath, AddTime, Pid
+    Id, DevicId, LuserID, SessionId, PreviewHandle, OrderNo, VideoPath, StreamPath, AddTime, 
+    Pid, IsRunMp4, IsRunStream
   </sql>
   <select id="selectByExample" resultMap="BaseResultMap" parameterType="com.model.pojo.DeviclistExample" >
     select
@@ -113,11 +114,15 @@
   </delete>
   <insert id="insert" parameterType="com.model.pojo.Deviclist" >
     insert into devicList (Id, DevicId, LuserID, 
-      OrderNo, VideoPath, StreamPath, 
-      AddTime, Pid)
+      SessionId, PreviewHandle, OrderNo, 
+      VideoPath, StreamPath, AddTime, 
+      Pid, IsRunMp4, IsRunStream
+      )
     values (#{id,jdbcType=INTEGER}, #{devicid,jdbcType=VARCHAR}, #{luserid,jdbcType=INTEGER}, 
-      #{orderno,jdbcType=VARCHAR}, #{videopath,jdbcType=VARCHAR}, #{streampath,jdbcType=VARCHAR}, 
-      #{addtime,jdbcType=VARCHAR}, #{pid,jdbcType=INTEGER})
+      #{sessionid,jdbcType=INTEGER}, #{previewhandle,jdbcType=INTEGER}, #{orderno,jdbcType=VARCHAR}, 
+      #{videopath,jdbcType=VARCHAR}, #{streampath,jdbcType=VARCHAR}, #{addtime,jdbcType=VARCHAR}, 
+      #{pid,jdbcType=INTEGER}, #{isrunmp4,jdbcType=INTEGER}, #{isrunstream,jdbcType=INTEGER}
+      )
   </insert>
   <insert id="insertSelective" parameterType="com.model.pojo.Deviclist" >
     insert into devicList
@@ -130,6 +135,12 @@
       </if>
       <if test="luserid != null" >
         LuserID,
+      </if>
+      <if test="sessionid != null" >
+        SessionId,
+      </if>
+      <if test="previewhandle != null" >
+        PreviewHandle,
       </if>
       <if test="orderno != null" >
         OrderNo,
@@ -146,6 +157,12 @@
       <if test="pid != null" >
         Pid,
       </if>
+      <if test="isrunmp4 != null" >
+        IsRunMp4,
+      </if>
+      <if test="isrunstream != null" >
+        IsRunStream,
+      </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides="," >
       <if test="id != null" >
@@ -156,6 +173,12 @@
       </if>
       <if test="luserid != null" >
         #{luserid,jdbcType=INTEGER},
+      </if>
+      <if test="sessionid != null" >
+        #{sessionid,jdbcType=INTEGER},
+      </if>
+      <if test="previewhandle != null" >
+        #{previewhandle,jdbcType=INTEGER},
       </if>
       <if test="orderno != null" >
         #{orderno,jdbcType=VARCHAR},
@@ -171,6 +194,12 @@
       </if>
       <if test="pid != null" >
         #{pid,jdbcType=INTEGER},
+      </if>
+      <if test="isrunmp4 != null" >
+        #{isrunmp4,jdbcType=INTEGER},
+      </if>
+      <if test="isrunstream != null" >
+        #{isrunstream,jdbcType=INTEGER},
       </if>
     </trim>
   </insert>
@@ -192,6 +221,12 @@
       <if test="record.luserid != null" >
         LuserID = #{record.luserid,jdbcType=INTEGER},
       </if>
+      <if test="record.sessionid != null" >
+        SessionId = #{record.sessionid,jdbcType=INTEGER},
+      </if>
+      <if test="record.previewhandle != null" >
+        PreviewHandle = #{record.previewhandle,jdbcType=INTEGER},
+      </if>
       <if test="record.orderno != null" >
         OrderNo = #{record.orderno,jdbcType=VARCHAR},
       </if>
@@ -207,6 +242,12 @@
       <if test="record.pid != null" >
         Pid = #{record.pid,jdbcType=INTEGER},
       </if>
+      <if test="record.isrunmp4 != null" >
+        IsRunMp4 = #{record.isrunmp4,jdbcType=INTEGER},
+      </if>
+      <if test="record.isrunstream != null" >
+        IsRunStream = #{record.isrunstream,jdbcType=INTEGER},
+      </if>
     </set>
     <if test="_parameter != null" >
       <include refid="Update_By_Example_Where_Clause" />
@@ -217,11 +258,15 @@
     set Id = #{record.id,jdbcType=INTEGER},
       DevicId = #{record.devicid,jdbcType=VARCHAR},
       LuserID = #{record.luserid,jdbcType=INTEGER},
+      SessionId = #{record.sessionid,jdbcType=INTEGER},
+      PreviewHandle = #{record.previewhandle,jdbcType=INTEGER},
       OrderNo = #{record.orderno,jdbcType=VARCHAR},
       VideoPath = #{record.videopath,jdbcType=VARCHAR},
       StreamPath = #{record.streampath,jdbcType=VARCHAR},
       AddTime = #{record.addtime,jdbcType=VARCHAR},
-      Pid = #{record.pid,jdbcType=INTEGER}
+      Pid = #{record.pid,jdbcType=INTEGER},
+      IsRunMp4 = #{record.isrunmp4,jdbcType=INTEGER},
+      IsRunStream = #{record.isrunstream,jdbcType=INTEGER}
     <if test="_parameter != null" >
       <include refid="Update_By_Example_Where_Clause" />
     </if>
@@ -234,6 +279,12 @@
       </if>
       <if test="luserid != null" >
         LuserID = #{luserid,jdbcType=INTEGER},
+      </if>
+      <if test="sessionid != null" >
+        SessionId = #{sessionid,jdbcType=INTEGER},
+      </if>
+      <if test="previewhandle != null" >
+        PreviewHandle = #{previewhandle,jdbcType=INTEGER},
       </if>
       <if test="orderno != null" >
         OrderNo = #{orderno,jdbcType=VARCHAR},
@@ -250,6 +301,12 @@
       <if test="pid != null" >
         Pid = #{pid,jdbcType=INTEGER},
       </if>
+      <if test="isrunmp4 != null" >
+        IsRunMp4 = #{isrunmp4,jdbcType=INTEGER},
+      </if>
+      <if test="isrunstream != null" >
+        IsRunStream = #{isrunstream,jdbcType=INTEGER},
+      </if>
     </set>
     where Id = #{id,jdbcType=INTEGER}
   </update>
@@ -257,11 +314,15 @@
     update devicList
     set DevicId = #{devicid,jdbcType=VARCHAR},
       LuserID = #{luserid,jdbcType=INTEGER},
+      SessionId = #{sessionid,jdbcType=INTEGER},
+      PreviewHandle = #{previewhandle,jdbcType=INTEGER},
       OrderNo = #{orderno,jdbcType=VARCHAR},
       VideoPath = #{videopath,jdbcType=VARCHAR},
       StreamPath = #{streampath,jdbcType=VARCHAR},
       AddTime = #{addtime,jdbcType=VARCHAR},
-      Pid = #{pid,jdbcType=INTEGER}
+      Pid = #{pid,jdbcType=INTEGER},
+      IsRunMp4 = #{isrunmp4,jdbcType=INTEGER},
+      IsRunStream = #{isrunstream,jdbcType=INTEGER}
     where Id = #{id,jdbcType=INTEGER}
   </update>
 </mapper>

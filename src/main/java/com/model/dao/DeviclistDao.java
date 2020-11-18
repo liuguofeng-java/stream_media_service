@@ -30,7 +30,7 @@ public interface DeviclistDao {
      * @param devicId 设备id
      * @return Deviclist
      */
-    Deviclist queryDevicDevicId(String devicId);
+    List<Deviclist> queryDevicDevicId(String devicId);
 
     /**
      * 添加对象
@@ -45,13 +45,6 @@ public interface DeviclistDao {
      * @return boolean
      */
     boolean updateDeviclist(Deviclist deviclist);
-
-    /**
-     * 根据订单号和推流地址不为空查询
-     * @param orderNo 订单
-     * @return 推流地址
-     */
-    String queryOrderNoAndStreamPathNotNull(String orderNo);
 
 
     /**

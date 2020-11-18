@@ -294,6 +294,126 @@ public class DeviclistExample {
             return (Criteria) this;
         }
 
+        public Criteria andSessionidIsNull() {
+            addCriterion("SessionId is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andSessionidIsNotNull() {
+            addCriterion("SessionId is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andSessionidEqualTo(Integer value) {
+            addCriterion("SessionId =", value, "sessionid");
+            return (Criteria) this;
+        }
+
+        public Criteria andSessionidNotEqualTo(Integer value) {
+            addCriterion("SessionId <>", value, "sessionid");
+            return (Criteria) this;
+        }
+
+        public Criteria andSessionidGreaterThan(Integer value) {
+            addCriterion("SessionId >", value, "sessionid");
+            return (Criteria) this;
+        }
+
+        public Criteria andSessionidGreaterThanOrEqualTo(Integer value) {
+            addCriterion("SessionId >=", value, "sessionid");
+            return (Criteria) this;
+        }
+
+        public Criteria andSessionidLessThan(Integer value) {
+            addCriterion("SessionId <", value, "sessionid");
+            return (Criteria) this;
+        }
+
+        public Criteria andSessionidLessThanOrEqualTo(Integer value) {
+            addCriterion("SessionId <=", value, "sessionid");
+            return (Criteria) this;
+        }
+
+        public Criteria andSessionidIn(List<Integer> values) {
+            addCriterion("SessionId in", values, "sessionid");
+            return (Criteria) this;
+        }
+
+        public Criteria andSessionidNotIn(List<Integer> values) {
+            addCriterion("SessionId not in", values, "sessionid");
+            return (Criteria) this;
+        }
+
+        public Criteria andSessionidBetween(Integer value1, Integer value2) {
+            addCriterion("SessionId between", value1, value2, "sessionid");
+            return (Criteria) this;
+        }
+
+        public Criteria andSessionidNotBetween(Integer value1, Integer value2) {
+            addCriterion("SessionId not between", value1, value2, "sessionid");
+            return (Criteria) this;
+        }
+
+        public Criteria andPreviewhandleIsNull() {
+            addCriterion("PreviewHandle is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andPreviewhandleIsNotNull() {
+            addCriterion("PreviewHandle is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andPreviewhandleEqualTo(Integer value) {
+            addCriterion("PreviewHandle =", value, "previewhandle");
+            return (Criteria) this;
+        }
+
+        public Criteria andPreviewhandleNotEqualTo(Integer value) {
+            addCriterion("PreviewHandle <>", value, "previewhandle");
+            return (Criteria) this;
+        }
+
+        public Criteria andPreviewhandleGreaterThan(Integer value) {
+            addCriterion("PreviewHandle >", value, "previewhandle");
+            return (Criteria) this;
+        }
+
+        public Criteria andPreviewhandleGreaterThanOrEqualTo(Integer value) {
+            addCriterion("PreviewHandle >=", value, "previewhandle");
+            return (Criteria) this;
+        }
+
+        public Criteria andPreviewhandleLessThan(Integer value) {
+            addCriterion("PreviewHandle <", value, "previewhandle");
+            return (Criteria) this;
+        }
+
+        public Criteria andPreviewhandleLessThanOrEqualTo(Integer value) {
+            addCriterion("PreviewHandle <=", value, "previewhandle");
+            return (Criteria) this;
+        }
+
+        public Criteria andPreviewhandleIn(List<Integer> values) {
+            addCriterion("PreviewHandle in", values, "previewhandle");
+            return (Criteria) this;
+        }
+
+        public Criteria andPreviewhandleNotIn(List<Integer> values) {
+            addCriterion("PreviewHandle not in", values, "previewhandle");
+            return (Criteria) this;
+        }
+
+        public Criteria andPreviewhandleBetween(Integer value1, Integer value2) {
+            addCriterion("PreviewHandle between", value1, value2, "previewhandle");
+            return (Criteria) this;
+        }
+
+        public Criteria andPreviewhandleNotBetween(Integer value1, Integer value2) {
+            addCriterion("PreviewHandle not between", value1, value2, "previewhandle");
+            return (Criteria) this;
+        }
+
         public Criteria andOrdernoIsNull() {
             addCriterion("OrderNo is null");
             return (Criteria) this;
@@ -631,6 +751,126 @@ public class DeviclistExample {
 
         public Criteria andPidNotBetween(Integer value1, Integer value2) {
             addCriterion("Pid not between", value1, value2, "pid");
+            return (Criteria) this;
+        }
+
+        public Criteria andIsrunmp4IsNull() {
+            addCriterion("IsRunMp4 is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andIsrunmp4IsNotNull() {
+            addCriterion("IsRunMp4 is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andIsrunmp4EqualTo(Integer value) {
+            addCriterion("IsRunMp4 =", value, "isrunmp4");
+            return (Criteria) this;
+        }
+
+        public Criteria andIsrunmp4NotEqualTo(Integer value) {
+            addCriterion("IsRunMp4 <>", value, "isrunmp4");
+            return (Criteria) this;
+        }
+
+        public Criteria andIsrunmp4GreaterThan(Integer value) {
+            addCriterion("IsRunMp4 >", value, "isrunmp4");
+            return (Criteria) this;
+        }
+
+        public Criteria andIsrunmp4GreaterThanOrEqualTo(Integer value) {
+            addCriterion("IsRunMp4 >=", value, "isrunmp4");
+            return (Criteria) this;
+        }
+
+        public Criteria andIsrunmp4LessThan(Integer value) {
+            addCriterion("IsRunMp4 <", value, "isrunmp4");
+            return (Criteria) this;
+        }
+
+        public Criteria andIsrunmp4LessThanOrEqualTo(Integer value) {
+            addCriterion("IsRunMp4 <=", value, "isrunmp4");
+            return (Criteria) this;
+        }
+
+        public Criteria andIsrunmp4In(List<Integer> values) {
+            addCriterion("IsRunMp4 in", values, "isrunmp4");
+            return (Criteria) this;
+        }
+
+        public Criteria andIsrunmp4NotIn(List<Integer> values) {
+            addCriterion("IsRunMp4 not in", values, "isrunmp4");
+            return (Criteria) this;
+        }
+
+        public Criteria andIsrunmp4Between(Integer value1, Integer value2) {
+            addCriterion("IsRunMp4 between", value1, value2, "isrunmp4");
+            return (Criteria) this;
+        }
+
+        public Criteria andIsrunmp4NotBetween(Integer value1, Integer value2) {
+            addCriterion("IsRunMp4 not between", value1, value2, "isrunmp4");
+            return (Criteria) this;
+        }
+
+        public Criteria andIsrunstreamIsNull() {
+            addCriterion("IsRunStream is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andIsrunstreamIsNotNull() {
+            addCriterion("IsRunStream is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andIsrunstreamEqualTo(Integer value) {
+            addCriterion("IsRunStream =", value, "isrunstream");
+            return (Criteria) this;
+        }
+
+        public Criteria andIsrunstreamNotEqualTo(Integer value) {
+            addCriterion("IsRunStream <>", value, "isrunstream");
+            return (Criteria) this;
+        }
+
+        public Criteria andIsrunstreamGreaterThan(Integer value) {
+            addCriterion("IsRunStream >", value, "isrunstream");
+            return (Criteria) this;
+        }
+
+        public Criteria andIsrunstreamGreaterThanOrEqualTo(Integer value) {
+            addCriterion("IsRunStream >=", value, "isrunstream");
+            return (Criteria) this;
+        }
+
+        public Criteria andIsrunstreamLessThan(Integer value) {
+            addCriterion("IsRunStream <", value, "isrunstream");
+            return (Criteria) this;
+        }
+
+        public Criteria andIsrunstreamLessThanOrEqualTo(Integer value) {
+            addCriterion("IsRunStream <=", value, "isrunstream");
+            return (Criteria) this;
+        }
+
+        public Criteria andIsrunstreamIn(List<Integer> values) {
+            addCriterion("IsRunStream in", values, "isrunstream");
+            return (Criteria) this;
+        }
+
+        public Criteria andIsrunstreamNotIn(List<Integer> values) {
+            addCriterion("IsRunStream not in", values, "isrunstream");
+            return (Criteria) this;
+        }
+
+        public Criteria andIsrunstreamBetween(Integer value1, Integer value2) {
+            addCriterion("IsRunStream between", value1, value2, "isrunstream");
+            return (Criteria) this;
+        }
+
+        public Criteria andIsrunstreamNotBetween(Integer value1, Integer value2) {
+            addCriterion("IsRunStream not between", value1, value2, "isrunstream");
             return (Criteria) this;
         }
     }

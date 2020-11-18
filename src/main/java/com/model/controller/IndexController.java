@@ -24,6 +24,6 @@ public class IndexController {
     @RequestMapping("/GetDeviceInfo")
     public Result getDeviceInfo(){
         List<Deviclist> deviclists = deviclistImpl.queryDeviclistAll();
-        return Result.formatToPojo(deviclists);
+        return Result.formatToPojo(200,deviclists);
     }
 }

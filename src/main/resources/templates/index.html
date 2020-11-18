@@ -28,7 +28,7 @@
         //执行一个 table 实例
         table.render({
             elem: '#table'
-            ,height: '100%'
+            ,height: '600px'
             ,url: '/sms/GetDeviceInfo' //数据接口
             ,parseData: function(res){ //res 即为原始返回的数据
                 return {
@@ -46,6 +46,7 @@
                 ,{field: 'videopath', title: 'MP4保存路径', width: 200}
                 ,{field: 'streampath', title: '推流地址', width:200}
                 ,{field: 'addtime', title: '设备注册时间', width: 200}
+                ,{field: 'pid', title: '推流进程id', width: 200}
             ] ]
         });
     });

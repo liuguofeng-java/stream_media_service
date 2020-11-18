@@ -8,10 +8,7 @@ import com.model.util.FFMpegUtli;
 import com.model.util.Result;
 import lombok.extern.log4j.Log4j2;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.ApplicationContextAware;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.interceptor.TransactionAspectSupport;
@@ -31,6 +28,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -64,40 +62,71 @@ public class CoreController {
     @Transactional(rollbackFor = {RuntimeException.class, Error.class})
     public Result startMp4(String orderNo, String deviceId) throws InterruptedException {
         if (StringUtils.isEmpty(orderNo)) {
-            return Result.formatToPojo("订单不能为空");
+            return Result.formatToPojo(400,"订单不能为空");
         }
         if (StringUtils.isEmpty(deviceId)) {
-            return Result.formatToPojo("设备不能为空");
+            return Result.formatToPojo(400,"设备不能为空");
         }
-        Deviclist devic = deviclistImpl.queryDevicDevicId(deviceId);
-        if (devic == null) {
-            return Result.formatToPojo("找不到设备");
+        List<Deviclist> devices = deviclistImpl.queryDevicDevicId(deviceId);
+        if (devices.size() == 0) {
+            return Result.formatToPojo(400,"找不到设备");
         }
+        //编辑文件夹格式
         String date = new SimpleDateFormat("MM-dd").format(new Date());
         String time = new SimpleDateFormat("HH-mm").format(new Date());
         String savePath = StreamMediaConfig.mp4SavePath + date + "\\" + time + "\\";
         String videoPath = savePath + orderNo + ".mp4";
-        devic.setVideopath(videoPath);
-        devic.setDevicid(deviceId);
-        devic.setOrderno(orderNo);
-        boolean updateDeviclist = deviclistImpl.updateDeviclist(devic);
-        if (!updateDeviclist) {
+
+        //判断是否是新的订单
+        Deviclist isNewOrderNo = null;
+        for(Deviclist item : devices){
+            if(item.getOrderno() == null){
+                isNewOrderNo = item;
+                break;
+            }
+            boolean equals = orderNo.equals(item.getOrderno());
+            if (equals && item.getOrderno() != null) {//判断是否是新订单
+                isNewOrderNo = item;
+                break;
+            }
+        }
+
+        //如果是新的订单则新增否则修改订单
+        boolean DeviclistFlag = false;
+        if(isNewOrderNo != null){//新的订单就添加
+            isNewOrderNo.setVideopath(videoPath);
+            isNewOrderNo.setOrderno(orderNo);
+            DeviclistFlag = deviclistImpl.updateDeviclist(isNewOrderNo);
+        }else {
+            isNewOrderNo = new Deviclist();
+            isNewOrderNo.setOrderno(orderNo);
+            isNewOrderNo.setVideopath(videoPath);
+            isNewOrderNo.setLuserid(devices.get(0).getLuserid());
+            isNewOrderNo.setDevicid(devices.get(0).getDevicid());
+            isNewOrderNo.setAddtime(new Date().toString());
+            DeviclistFlag = deviclistImpl.insertDeviclist(isNewOrderNo);
+        }
+
+        if (!DeviclistFlag) {
             log.error("修改数据订单号失败");
             TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();//回滚事务
-            return Result.formatToPojo("修改数据失败");
+            return Result.formatToPojo(400,"修改数据失败");
         }
+
+        //创建MP4文件保存路径
         File path = new File(savePath);
         if (!path.exists()) {
             path.mkdirs();
         }
+
         //海康SDK保存MP4文件
-        boolean startPreview = haikSDK.StartPreview(devic.getLuserid());
+        boolean startPreview = haikSDK.StartPreview(isNewOrderNo.getLuserid());
         if (!startPreview) {
             log.error("海康SDK保存MP4时异常");
             TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();//回滚事务
-            return Result.formatToPojo("保存数据异常");
+            return Result.formatToPojo(400,"保存数据异常");
         }
-        return Result.formatToPojo(true);
+        return Result.formatToPojo(200,true);
     }
 
     /**
@@ -111,24 +140,17 @@ public class CoreController {
     @RequestMapping(value = "/stopmp4", method = RequestMethod.GET)
     public Result stopMp4(String orderNo, String deviceId) {
         if (StringUtils.isEmpty(orderNo)) {
-            return Result.formatToPojo("订单不能为空");
+            return Result.formatToPojo(400,"订单不能为空");
         }
 
         if (StringUtils.isEmpty(deviceId)) {
-            return Result.formatToPojo("设备不能为空");
+            return Result.formatToPojo(400,"设备不能为空");
         }
-        boolean StopPreview = haikSDK.StopPreview();
+        boolean StopPreview = haikSDK.StopPreview(0,0);
         if (!StopPreview) {
-            return Result.formatToPojo("停止失败");
+            return Result.formatToPojo(400,"停止失败");
         }
-        Deviclist d = deviclistImpl.queryDeviclistOrderNo(orderNo);
-        if(d != null){
-            d.setPid(null);
-            d.setStreampath(null);
-            d.setStreampath(null);
-            deviclistImpl.updateDeviclist(d);
-        }
-        return Result.formatToPojo(true);
+        return Result.formatToPojo(200,true);
     }
 
     /**
@@ -143,27 +165,26 @@ public class CoreController {
     public Result getStream(String orderNo, String deviceId) {
         try {
             if (StringUtils.isEmpty(orderNo)) {
-                return Result.formatToPojo("订单不能为空");
+                return Result.formatToPojo(400,"订单不能为空");
             }
             if (StringUtils.isEmpty(deviceId)) {
-                return Result.formatToPojo("设备不能为空");
+                return Result.formatToPojo(400,"设备不能为空");
+            }
+            Deviclist deviclist = deviclistImpl.queryDeviclistOrderNo(orderNo);
+            //查询设备是否注册
+            if(deviclist == null){
+                return Result.formatToPojo(400,"设备不存在");
             }
             //判断码流是不是存在
-            String path = deviclistImpl.queryOrderNoAndStreamPathNotNull(orderNo);
-            if (path != null) {
-                return Result.formatToPojo(path);
+            if(StringUtils.isNotEmpty(deviclist.getStreampath())){
+                return Result.formatToPojo(200,deviclist.getStreampath());
             }
-            //查询设备是否注册
-            Deviclist deviclist = deviclistImpl.queryDeviclistOrderNo(orderNo);
-            if (deviclist == null) {
-                return Result.formatToPojo("设备不在线");
-            }
-            //调用线程池
+            //创建路径调用ffmpeg
             String format = new SimpleDateFormat("MM-dd-hh-mm").format(new Date());
             String m3u8Path = format + "\\" + orderNo;
             Map<String,Object> m3u8 = new FFMpegUtli().getM3u8(deviclist.getVideopath(), m3u8Path);
             if (!(Boolean) m3u8.get("bool")) {
-                Result.formatToPojo("转流失败");
+                return Result.formatToPojo(400,"转流失败");
             }
             //码流
             String stream = StreamMediaConfig.m3u8Url + m3u8Path.replace("\\", "/") + ".m3u8";
@@ -174,10 +195,10 @@ public class CoreController {
             boolean b = deviclistImpl.updateDeviclist(deviclist);
             if (!b)
                 log.error("添加推流地址失败");
-            return Result.formatToPojo(true);
+            return Result.formatToPojo(200,true);
         } catch (Exception ex) {
             log.error("转流失败:" + ex.getMessage());
-            return Result.formatToPojo("转流失败");
+            return Result.formatToPojo(400,"转流失败");
         }
     }
 
@@ -191,23 +212,15 @@ public class CoreController {
     public Result stopStream(String orderNo) {
         try {
             Deviclist deviclist = deviclistImpl.queryDeviclistOrderNo(orderNo);
-            if(new FFMpegUtli().stopStream(deviclist)){
-                Deviclist d = deviclistImpl.queryDeviclistOrderNo(orderNo);
-                if(d != null){
-                    log.info("进程结束pid:" + d.getPid());
-                    d.setPid(null);
-                    d.setStreampath(null);
-                    d.setStreampath(null);
-                    deviclistImpl.updateDeviclist(d);
-                }
-                return Result.formatToPojo(true);
+            boolean ffmpegFlag = new FFMpegUtli().stopStream(deviclist);
+            if(ffmpegFlag){
+                return Result.formatToPojo(200,true);
             }else {
-                return Result.formatToPojo("停止推流失败");
+                return Result.formatToPojo(400,"停止推流失败");
             }
-
         }catch(Exception ex){
             log.error("停止推流出错" + ex.getMessage());
-            return Result.formatToPojo("停止推流出错");
+            return Result.formatToPojo(400,"停止推流出错");
         }
     }
 
@@ -223,17 +236,17 @@ public class CoreController {
     @RequestMapping(value = "/GetHls", method = RequestMethod.POST)
     public Result GetHls(String orderNo, String deviceId) {
         if (StringUtils.isEmpty(orderNo)) {
-            return Result.formatToPojo("订单不能为空");
+            return Result.formatToPojo(400,"订单不能为空");
         }
         if (StringUtils.isEmpty(deviceId)) {
-            return Result.formatToPojo("设备不能为空");
+            return Result.formatToPojo(400,"设备不能为空");
         }
         //判断码流是不是存在
-        String path = deviclistImpl.queryOrderNoAndStreamPathNotNull(orderNo);
-        if (path == null) {
-            return Result.formatToPojo("没有捕获到任何媒体流");
+        Deviclist deviclist = deviclistImpl.queryDeviclistOrderNo(orderNo);
+        if (deviclist.getStreampath() == null) {
+            return Result.formatToPojo(400,"没有捕获到任何媒体流");
         } else {
-            return Result.formatToPojo(path);
+            return Result.formatToPojo(200,deviclist.getStreampath());
         }
     }
 

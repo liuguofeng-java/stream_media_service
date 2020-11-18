@@ -82,7 +82,7 @@ public class Result implements Serializable {
     }
 
 
-    public static Result formatToPojo(Object data) {
+    public static Result formatToPojo(int status,Object data) {
         Result result = new Result();
         result.status = 200;
         result.msg = "OK";

@@ -9,6 +9,7 @@ import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import javax.swing.*;
 import java.io.*;
 import java.nio.ByteBuffer;
 import java.text.SimpleDateFormat;
@@ -33,7 +34,6 @@ public class HaikSDK {
     HCISUPStream.NET_EHOME_LISTEN_PREVIEW_CFG struListen = new HCISUPStream.NET_EHOME_LISTEN_PREVIEW_CFG();
 
     public HaikSDK() {
-        lPreviewHandle = new NativeLong(-1);
         fPREVIEW_NEWLINK_CB= null;
         fPREVIEW_DATA_CB = null;
         init();
@@ -113,7 +113,6 @@ public class HaikSDK {
                 ByteBuffer byteBuffer = pPreviewCBMsg.pRecvdata.getByteBuffer(offset,pPreviewCBMsg.dwDataLen);
                 byte[] bytes = new byte[pPreviewCBMsg.dwDataLen];
                 byteBuffer.get(bytes);
-
                 out.write(bytes);
                 out.close();
             }catch (Exception ex){
@@ -230,19 +229,18 @@ public class HaikSDK {
     /**
      * 停止录像
      */
-    public boolean StopPreview() {
-        //停止预览
-        if(lPreviewHandle.byteValue() >= 0)
+    public boolean StopPreview(int loginID,int sessionID) {
+        NativeLong lSessionID = new NativeLong(sessionID);
+        NativeLong lLoginID = new NativeLong(loginID);
+        //释放CMS预览请求资源
+        if(!hCEhomeCMS.NET_ECMS_StopGetRealStream(lLoginID, lSessionID))
         {
-            if (!hCEhomeStream.NET_ESTREAM_StopPreview(lPreviewHandle))
-            {
-                log.error("NET_ESTREAM_StopPreview failed, error code: %d\n" + hCEhomeCMS.NET_ECMS_GetLastError());
-                return false;
-            }
-            lPreviewHandle.setValue(-1);
+            JOptionPane.showMessageDialog(null,"NET_ECMS_StopGetRealStream failed, error code: %d\n" + hCEhomeCMS.NET_ECMS_GetLastError());
+            return false;
         }
         return true;
     }
+
 
     //添加设备信息
     public boolean insertDevicInfo(String devicId, Integer luserID){
