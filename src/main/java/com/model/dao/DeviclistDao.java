@@ -73,4 +73,19 @@ public interface DeviclistDao {
      * @return Deviclist
      */
     Deviclist queryPid(long pid);
+
+
+    /**
+     * 根据sessionId查询
+     * @param sessionId 设备预览id，调用停止预览方法 sessionId失效
+     * @return Deviclist
+     */
+    Deviclist queryDevicDevicSessionId(int sessionId);
+
+    /**
+     * 改变userId
+     * @param deviclist
+     * @return
+     */
+    boolean updateDeviclistAll(Deviclist deviclist);
 }

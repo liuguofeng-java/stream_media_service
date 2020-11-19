@@ -119,4 +119,29 @@ public class DeviclistImpl implements DeviclistDao {
             return deviclists.get(0);
         }
     }
+
+    @Override
+    public Deviclist queryDevicDevicSessionId(int sessionId) {
+        DeviclistExample example = new DeviclistExample();
+        DeviclistExample.Criteria criteria = example.createCriteria();
+        criteria.andSessionidEqualTo(sessionId);
+        List<Deviclist> deviclists = deviclistMapper.selectByExample(example);
+        if(deviclists.size() == 0){
+            return null;
+        }else {
+            return deviclists.get(0);
+        }
+    }
+
+    @Override
+    public boolean updateDeviclistAll(Deviclist deviclist) {
+        DeviclistExample example = new DeviclistExample();
+        DeviclistExample.Criteria criteria = example.createCriteria();
+        criteria.andDevicidEqualTo(deviclist.getDevicid());
+        Deviclist device = new Deviclist();
+        device.setDevicid(deviclist.getDevicid());
+        device.setLuserid(deviclist.getLuserid());
+        int flag = deviclistMapper.updateByExample(deviclist, example);
+        return flag > 0;
+    }
 }

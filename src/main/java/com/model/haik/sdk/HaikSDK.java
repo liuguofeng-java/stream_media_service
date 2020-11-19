@@ -14,6 +14,9 @@ import java.io.*;
 import java.nio.ByteBuffer;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @Log4j2
 @Component
@@ -26,9 +29,6 @@ public class HaikSDK {
 
     FPREVIEW_NEWLINK_CB fPREVIEW_NEWLINK_CB;//预览监听回调函数实现
     FPREVIEW_DATA_CB fPREVIEW_DATA_CB;//预览回调函数实现
-
-    //预览请求输出参数
-    NativeLong lPreviewHandle;//预览句柄
 
     HCISUPCMS.NET_EHOME_CMS_LISTEN_PARAM struCMSListenPara = new HCISUPCMS.NET_EHOME_CMS_LISTEN_PARAM();
     HCISUPStream.NET_EHOME_LISTEN_PREVIEW_CFG struListen = new HCISUPStream.NET_EHOME_LISTEN_PREVIEW_CFG();
@@ -63,7 +63,7 @@ public class HaikSDK {
                 case 1:
                     log.info("设备退出lUserID:" + lUserID);
                     //添加设备信息
-                    return deviceQuit(lUserID.intValue());
+                    return true /*deviceQuit(lUserID.intValue())*/;
                 default:
                     log.info("FRegisterCallBack default type:" + dwDataType);
                     break;
@@ -80,8 +80,11 @@ public class HaikSDK {
         public boolean invoke(NativeLong lLinkHandle, HCISUPStream.NET_EHOME_NEWLINK_CB_MSG pNewLinkCBMsg, Pointer pUserData)
         {
             log.info("FPREVIEW_NEWLINK_CB callback");
-            lPreviewHandle = lLinkHandle;
-
+            int sessionID = pNewLinkCBMsg.iSessionID.intValue();
+            boolean setPreviewHandle = setPreviewHandle(sessionID, lLinkHandle.intValue());
+            if(!setPreviewHandle){
+                log.error("根据sessionId设置PreviewHandle失败");
+            }
             //预览数据回调参数
             HCISUPStream.NET_EHOME_PREVIEW_DATA_CB_PARAM struDataCB = new HCISUPStream.NET_EHOME_PREVIEW_DATA_CB_PARAM();
             if (fPREVIEW_DATA_CB == null)
@@ -92,7 +95,7 @@ public class HaikSDK {
 
             if (!hCEhomeStream.NET_ESTREAM_SetPreviewDataCB(lLinkHandle, struDataCB))
             {
-                log.error("NET_ESTREAM_SetPreviewDataCB()错误代码号：" + hCEhomeStream.NET_ESTREAM_GetLastError());
+                log.error("NET_ESTREAM_SetPreviewDataCB错误代码号：" + hCEhomeStream.NET_ESTREAM_GetLastError());
                 return false;
             }
             return true;
@@ -107,8 +110,8 @@ public class HaikSDK {
         public void invoke(NativeLong iPreviewHandle, HCISUPStream.NET_EHOME_PREVIEW_CB_MSG pPreviewCBMsg, Pointer pUserData)
         {
             try{
-                Deviclist deviclist = deviclistImpl.queryLuserID(0);
-                FileOutputStream out = new FileOutputStream(new File(deviclist.getVideopath()),true);
+                String path = deviceInfo.get(iPreviewHandle.intValue());
+                FileOutputStream out = new FileOutputStream(new File(path),true);
                 long offset = 0;
                 ByteBuffer byteBuffer = pPreviewCBMsg.pRecvdata.getByteBuffer(offset,pPreviewCBMsg.dwDataLen);
                 byte[] bytes = new byte[pPreviewCBMsg.dwDataLen];
@@ -152,14 +155,17 @@ public class HaikSDK {
      * 保存录像
      * @return 是否成功
      */
-    public boolean StartPreview(int Id) {
-        NativeLong lLoginID = new NativeLong(Id);
+    public Map<String,Object> StartPreview(int loginID) {
+        Map<String,Object> map = new HashMap<>();
+        NativeLong lLoginID = new NativeLong(loginID);
         ////////////////////////////////////////////////////////////////////////
         //流媒体服务器(VTDU)监听取流
         //取流库初始化
         boolean nInit = hCEhomeStream.NET_ESTREAM_Init();
         if(!nInit){
             log.error("取流库初始化");
+            map.put("bool",false);
+            return map;
         }
 
         //预览监听参数
@@ -168,62 +174,62 @@ public class HaikSDK {
             fPREVIEW_NEWLINK_CB= new FPREVIEW_NEWLINK_CB();
         }
 
-        struListen.struIPAdress.szIP = StreamMediaConfig.serviceIp.getBytes();
+        struListen.struIPAdress.szIP = StreamMediaConfig.intranetIp.getBytes();
         struListen.struIPAdress.wPort = 9093; //流媒体服务器监听端口
         struListen.fnNewLinkCB = fPREVIEW_NEWLINK_CB; //预览连接请求回调函数
         struListen.pUser = null;
-        struListen.byLinkMode = 1; //0- TCP方式，1- UDP方式
+        struListen.byLinkMode = 0; //0- TCP方式，1- UDP方式
 
         //启动预览监听
-        if(lPreviewHandle.byteValue() < 0)
+        NativeLong lHandle = hCEhomeStream.NET_ESTREAM_StartListenPreview(struListen);
+        if(lHandle.longValue() < -1)
         {
-            NativeLong lHandle = hCEhomeStream.NET_ESTREAM_StartListenPreview(struListen);
-            if(lHandle.longValue() < -1)
-            {
-                log.error("NET_ESTREAM_StartListenPreview failed, error code:" + hCEhomeStream.NET_ESTREAM_GetLastError());
-                hCEhomeStream.NET_ESTREAM_Fini();
-                return false;
-            }
-            log.info("NET_ESTREAM_StartListenPreview启动预览监听成功!");
-
-            //预览请求输入参数
-            HCISUPCMS.NET_EHOME_PREVIEWINFO_IN struPreviewIn = new HCISUPCMS.NET_EHOME_PREVIEWINFO_IN();
-            struPreviewIn.iChannel = 1; //通道号
-            struPreviewIn.dwLinkMode = 1; //0- TCP方式，1- UDP方式
-            struPreviewIn.dwStreamType = 0; //码流类型：0- 主码流，1- 子码流, 2- 第三码流
-            struPreviewIn.struStreamSever.szIP = StreamMediaConfig.serviceIp.getBytes();//流媒体服务器IP地址
-            struPreviewIn.struStreamSever.wPort = 9093; //流媒体服务器端口，需要跟服务器启动监听端口一致
-
-            //预览请求
-            HCISUPCMS.NET_EHOME_PREVIEWINFO_OUT struPreviewOut = new HCISUPCMS.NET_EHOME_PREVIEWINFO_OUT();
-            if(!hCEhomeCMS.NET_ECMS_StartGetRealStream(lLoginID, struPreviewIn, struPreviewOut))
-            {
-                log.error("NET_ECMS_StartGetRealStream failed, error code:" + hCEhomeCMS.NET_ECMS_GetLastError());
-                return false;
-            }
-
-            struPreviewOut.read();
-            log.info("NET_ECMS_StartGetRealStream预览请求成功, sessionID:" + struPreviewOut.lSessionID);
-
-            HCISUPCMS.NET_EHOME_PUSHSTREAM_IN struPushInfoIn = new HCISUPCMS.NET_EHOME_PUSHSTREAM_IN();
-            struPushInfoIn.read();
-            struPushInfoIn.dwSize = struPushInfoIn.size();
-            struPushInfoIn.lSessionID = struPreviewOut.lSessionID;
-            struPushInfoIn.write();
-
-            HCISUPCMS.NET_EHOME_PUSHSTREAM_OUT struPushInfoOut = new HCISUPCMS.NET_EHOME_PUSHSTREAM_OUT();
-            struPushInfoOut.read();
-            struPushInfoOut.dwSize = struPushInfoOut.size();
-            struPushInfoOut.write();
-            if(!hCEhomeCMS.NET_ECMS_StartPushRealStream(lLoginID,struPushInfoIn, struPushInfoOut)){
-                log.error("NET_ECMS_StartPushRealStream failed, error code:" + hCEhomeCMS.NET_ECMS_GetLastError());
-                return false;
-            }
-            log.info("NET_ECMS_StartPushRealStream succeed, sessionID:" + struPushInfoIn.lSessionID);
-        }else {
-            log.info("lPreviewHandle" + lPreviewHandle.byteValue());
+            log.error("NET_ESTREAM_StartListenPreview failed, error code:" + hCEhomeStream.NET_ESTREAM_GetLastError());
+            hCEhomeStream.NET_ESTREAM_Fini();
+            map.put("bool",false);
+            return map;
         }
-        return true;
+        log.info("NET_ESTREAM_StartListenPreview启动预览监听成功!");
+
+        //预览请求输入参数
+        HCISUPCMS.NET_EHOME_PREVIEWINFO_IN struPreviewIn = new HCISUPCMS.NET_EHOME_PREVIEWINFO_IN();
+        struPreviewIn.iChannel = 1; //通道号
+        struPreviewIn.dwLinkMode = 0; //0- TCP方式，1- UDP方式
+        struPreviewIn.dwStreamType = 0; //码流类型：0- 主码流，1- 子码流, 2- 第三码流
+        struPreviewIn.struStreamSever.szIP = StreamMediaConfig.serviceIp.getBytes();//流媒体服务器IP地址
+        struPreviewIn.struStreamSever.wPort = 9093; //流媒体服务器端口，需要跟服务器启动监听端口一致
+
+        //预览请求
+        HCISUPCMS.NET_EHOME_PREVIEWINFO_OUT struPreviewOut = new HCISUPCMS.NET_EHOME_PREVIEWINFO_OUT();
+        if(!hCEhomeCMS.NET_ECMS_StartGetRealStream(lLoginID, struPreviewIn, struPreviewOut))
+        {
+            log.error("NET_ECMS_StartGetRealStream failed, error code:" + hCEhomeCMS.NET_ECMS_GetLastError());
+            map.put("bool",false);
+            return map;
+        }
+
+        struPreviewOut.read();
+        log.info("NET_ECMS_StartGetRealStream预览请求成功, sessionID:" + struPreviewOut.lSessionID);
+
+        HCISUPCMS.NET_EHOME_PUSHSTREAM_IN struPushInfoIn = new HCISUPCMS.NET_EHOME_PUSHSTREAM_IN();
+        struPushInfoIn.read();
+        struPushInfoIn.dwSize = struPushInfoIn.size();
+        struPushInfoIn.lSessionID = struPreviewOut.lSessionID;
+        struPushInfoIn.write();
+
+        HCISUPCMS.NET_EHOME_PUSHSTREAM_OUT struPushInfoOut = new HCISUPCMS.NET_EHOME_PUSHSTREAM_OUT();
+        struPushInfoOut.read();
+        struPushInfoOut.dwSize = struPushInfoOut.size();
+        struPushInfoOut.write();
+        if(!hCEhomeCMS.NET_ECMS_StartPushRealStream(lLoginID,struPushInfoIn, struPushInfoOut)){
+            log.error("NET_ECMS_StartPushRealStream failed, error code:" + hCEhomeCMS.NET_ECMS_GetLastError());
+            map.put("bool",false);
+            return map;
+        }
+        log.info("NET_ECMS_StartPushRealStream succeed, sessionID:" + struPushInfoIn.lSessionID);
+        map.put("sessionID",struPushInfoIn.lSessionID.intValue());
+        map.put("bool",true);
+        return map;
     }
 
     /**
@@ -247,13 +253,19 @@ public class HaikSDK {
         try{
             //记录数据
             Deviclist devic = new Deviclist();
-            devic.setDevicid(devicId);
 
-            String format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date());
-            devic.setAddtime(format);
-            devic.setLuserid(luserID);
-            boolean b = deviclistImpl.insertDeviclist(devic);
-            if(!b){
+            List<Deviclist> deviclists = deviclistImpl.queryDevicDevicId(devicId);
+            boolean flag;
+            if(deviclists.size() != 0){
+                flag = deviclistImpl.updateDeviclistAll(deviclists.get(0));
+            }else {
+                devic.setDevicid(devicId);
+                String format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date());
+                devic.setAddtime(format);
+                devic.setLuserid(luserID);
+                flag = deviclistImpl.insertDeviclist(devic);
+            }
+            if(!flag){
                 log.error("注册回调函数添加记录失败");
                 return false;
             }
@@ -275,4 +287,26 @@ public class HaikSDK {
         }
     }
 
+    //设备信息
+    private static Map<Integer,String> deviceInfo = new HashMap<>();
+
+    //设置previewHandle
+    public boolean setPreviewHandle(int sessionId,int previewHandle){
+        Deviclist deviclist = deviclistImpl.queryDevicDevicSessionId(sessionId);
+        if(deviclist == null){
+            //log.error("根据sessionId找不到实体");
+            return false;
+        }
+        deviclist.setPreviewhandle(previewHandle);
+        boolean updateDeviclist = deviclistImpl.updateDeviclist(deviclist);
+        if(!updateDeviclist){
+            //log.error("设置previewHandle失败");
+            return false;
+        }
+        if(deviceInfo.get(previewHandle) != null){ //如果有该previewHandle则删除
+            deviceInfo.remove(previewHandle);
+        }
+        deviceInfo.put(previewHandle,deviclist.getVideopath());
+        return true;
+    }
 }

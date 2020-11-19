@@ -60,73 +60,91 @@ public class CoreController {
     @ResponseBody
     @RequestMapping(value = "/startmp4", method = RequestMethod.GET)
     @Transactional(rollbackFor = {RuntimeException.class, Error.class})
-    public Result startMp4(String orderNo, String deviceId) throws InterruptedException {
-        if (StringUtils.isEmpty(orderNo)) {
-            return Result.formatToPojo(400,"订单不能为空");
-        }
-        if (StringUtils.isEmpty(deviceId)) {
-            return Result.formatToPojo(400,"设备不能为空");
-        }
-        List<Deviclist> devices = deviclistImpl.queryDevicDevicId(deviceId);
-        if (devices.size() == 0) {
-            return Result.formatToPojo(400,"找不到设备");
-        }
-        //编辑文件夹格式
-        String date = new SimpleDateFormat("MM-dd").format(new Date());
-        String time = new SimpleDateFormat("HH-mm").format(new Date());
-        String savePath = StreamMediaConfig.mp4SavePath + date + "\\" + time + "\\";
-        String videoPath = savePath + orderNo + ".mp4";
+    public Result startMp4(String orderNo, String deviceId) {
+       try{
+           if (StringUtils.isEmpty(orderNo)) {
+               return Result.formatToPojo(400,"订单不能为空");
+           }
+           if (StringUtils.isEmpty(deviceId)) {
+               return Result.formatToPojo(400,"设备不能为空");
+           }
+           List<Deviclist> devices = deviclistImpl.queryDevicDevicId(deviceId);
+           if (devices.size() == 0) {
+               return Result.formatToPojo(400,"找不到设备");
+           }
+           //编辑文件夹格式
+           String date = new SimpleDateFormat("MM-dd").format(new Date());
+           String time = new SimpleDateFormat("HH-mm").format(new Date());
+           String savePath = StreamMediaConfig.mp4SavePath + date + "\\" + time + "\\";
+           String videoPath = savePath + orderNo + ".mp4";
 
-        //判断是否是新的订单
-        Deviclist isNewOrderNo = null;
-        for(Deviclist item : devices){
-            if(item.getOrderno() == null){
-                isNewOrderNo = item;
-                break;
-            }
-            boolean equals = orderNo.equals(item.getOrderno());
-            if (equals && item.getOrderno() != null) {//判断是否是新订单
-                isNewOrderNo = item;
-                break;
-            }
-        }
+           //判断是否是新的订单
+           Deviclist isNewOrderNo = null;
+           for(Deviclist item : devices){
+               if(item.getOrderno() == null){
+                   isNewOrderNo = item;
+                   break;
+               }
+               boolean equals = orderNo.equals(item.getOrderno());
+               if (equals && item.getOrderno() != null) {//判断是否是新订单
+                   isNewOrderNo = item;
+                   break;
+               }
+           }
 
-        //如果是新的订单则新增否则修改订单
-        boolean DeviclistFlag = false;
-        if(isNewOrderNo != null){//新的订单就添加
-            isNewOrderNo.setVideopath(videoPath);
-            isNewOrderNo.setOrderno(orderNo);
-            DeviclistFlag = deviclistImpl.updateDeviclist(isNewOrderNo);
-        }else {
-            isNewOrderNo = new Deviclist();
-            isNewOrderNo.setOrderno(orderNo);
-            isNewOrderNo.setVideopath(videoPath);
-            isNewOrderNo.setLuserid(devices.get(0).getLuserid());
-            isNewOrderNo.setDevicid(devices.get(0).getDevicid());
-            isNewOrderNo.setAddtime(new Date().toString());
-            DeviclistFlag = deviclistImpl.insertDeviclist(isNewOrderNo);
-        }
+           //如果是新的订单则新增否则修改订单
+           boolean DeviclistFlag = false;
+           if(isNewOrderNo != null){//新的订单就添加
+               isNewOrderNo.setVideopath(videoPath);
+               isNewOrderNo.setOrderno(orderNo);
+               DeviclistFlag = deviclistImpl.updateDeviclist(isNewOrderNo);
+           }else {
+               isNewOrderNo = new Deviclist();
+               isNewOrderNo.setOrderno(orderNo);
+               isNewOrderNo.setVideopath(videoPath);
+               isNewOrderNo.setLuserid(devices.get(0).getLuserid());
+               isNewOrderNo.setDevicid(devices.get(0).getDevicid());
+               String addtime = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date());
+               isNewOrderNo.setAddtime(addtime);
+               DeviclistFlag = deviclistImpl.insertDeviclist(isNewOrderNo);
+           }
 
-        if (!DeviclistFlag) {
-            log.error("修改数据订单号失败");
-            TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();//回滚事务
-            return Result.formatToPojo(400,"修改数据失败");
-        }
+           if (!DeviclistFlag) {
+               log.error("修改数据订单号失败");
+               TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();//回滚事务
+               return Result.formatToPojo(400,"修改数据失败");
+           }
 
-        //创建MP4文件保存路径
-        File path = new File(savePath);
-        if (!path.exists()) {
-            path.mkdirs();
-        }
+           //创建MP4文件保存路径
+           File path = new File(savePath);
+           if (!path.exists()) {
+               path.mkdirs();
+           }
 
-        //海康SDK保存MP4文件
-        boolean startPreview = haikSDK.StartPreview(isNewOrderNo.getLuserid());
-        if (!startPreview) {
-            log.error("海康SDK保存MP4时异常");
-            TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();//回滚事务
-            return Result.formatToPojo(400,"保存数据异常");
-        }
-        return Result.formatToPojo(200,true);
+           //海康SDK保存MP4文件
+           Map<String,Object> startPreview = haikSDK.StartPreview(isNewOrderNo.getLuserid());
+           if (!(boolean)startPreview.get("bool")) {
+               log.error("海康SDK保存MP4时异常");
+               TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();//回滚事务
+               return Result.formatToPojo(400,"保存数据异常");
+           }
+
+           //更新设备状态
+           int sessionID = (int)startPreview.get("sessionID");
+           Deviclist deviclist = deviclistImpl.queryDeviclistOrderNo(isNewOrderNo.getOrderno());
+           deviclist.setSessionid(sessionID);
+           DeviclistFlag = deviclistImpl.updateDeviclist(deviclist);
+           if (!DeviclistFlag) {
+               log.error("修改数据订单号失败");
+               TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();//回滚事务
+               return Result.formatToPojo(400,"修改数据失败");
+           }
+           return Result.formatToPojo(200,true);
+       }catch(Exception ex){
+           log.error("保存MP4异常:" + ex.getMessage());
+           TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();//回滚事务
+           return Result.formatToPojo(400,"系统出错了");
+       }
     }
 
     /**
@@ -142,11 +160,14 @@ public class CoreController {
         if (StringUtils.isEmpty(orderNo)) {
             return Result.formatToPojo(400,"订单不能为空");
         }
-
         if (StringUtils.isEmpty(deviceId)) {
             return Result.formatToPojo(400,"设备不能为空");
         }
-        boolean StopPreview = haikSDK.StopPreview(0,0);
+        Deviclist deviclist = deviclistImpl.queryDeviclistOrderNo(orderNo);
+        if (deviclist == null || deviclist.getDevicid() == null) {
+            return Result.formatToPojo(400,"找不到设备");
+        }
+        boolean StopPreview = haikSDK.StopPreview(deviclist.getLuserid(),deviclist.getSessionid());
         if (!StopPreview) {
             return Result.formatToPojo(400,"停止失败");
         }
