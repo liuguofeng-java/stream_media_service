@@ -17,13 +17,15 @@ public class Deviclist {
 
     private String streampath;
 
-    private String addtime;
-
     private Integer pid;
+
+    private String addtime;
 
     private Integer isrunmp4;
 
     private Integer isrunstream;
+
+    private Integer isdeviceonline;
 
     public Integer getId() {
         return id;
@@ -89,20 +91,20 @@ public class Deviclist {
         this.streampath = streampath == null ? null : streampath.trim();
     }
 
-    public String getAddtime() {
-        return addtime;
-    }
-
-    public void setAddtime(String addtime) {
-        this.addtime = addtime == null ? null : addtime.trim();
-    }
-
     public Integer getPid() {
         return pid;
     }
 
     public void setPid(Integer pid) {
         this.pid = pid;
+    }
+
+    public String getAddtime() {
+        return addtime;
+    }
+
+    public void setAddtime(String addtime) {
+        this.addtime = addtime == null ? null : addtime.trim();
     }
 
     public Integer getIsrunmp4() {
@@ -119,5 +121,13 @@ public class Deviclist {
 
     public void setIsrunstream(Integer isrunstream) {
         this.isrunstream = isrunstream;
+    }
+
+    public Integer getIsdeviceonline() {
+        return isdeviceonline;
+    }
+
+    public void setIsdeviceonline(Integer isdeviceonline) {
+        this.isdeviceonline = isdeviceonline;
     }
 }

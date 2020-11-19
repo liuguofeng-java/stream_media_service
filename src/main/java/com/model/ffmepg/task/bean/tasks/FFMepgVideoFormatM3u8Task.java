@@ -66,6 +66,7 @@ public class FFMepgVideoFormatM3u8Task extends FFVideoTask<FFMpegVideoFormatM3u8
                     device.setPid(null);
                     device.setStreampath(null);
                     device.setStreampath(null);
+                    device.setIsrunstream(0);
                     deviclistImpl.updateDeviclist(device);
                     log.info("进程结束pid:" + pid);
                 }

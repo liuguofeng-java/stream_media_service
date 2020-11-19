@@ -95,7 +95,9 @@ public class CoreController {
            //如果是新的订单则新增否则修改订单
            boolean DeviclistFlag = false;
            if(isNewOrderNo != null){//新的订单就添加
-               isNewOrderNo.setVideopath(videoPath);
+               if(isNewOrderNo.getVideopath() == null || isNewOrderNo.getVideopath().equals("")){
+                   isNewOrderNo.setVideopath(videoPath);
+               }
                isNewOrderNo.setOrderno(orderNo);
                DeviclistFlag = deviclistImpl.updateDeviclist(isNewOrderNo);
            }else {
@@ -139,6 +141,8 @@ public class CoreController {
                TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();//回滚事务
                return Result.formatToPojo(400,"修改数据失败");
            }
+           deviclist.setIsrunmp4(1);
+           deviclistImpl.updateDeviclist(deviclist);
            return Result.formatToPojo(200,true);
        }catch(Exception ex){
            log.error("保存MP4异常:" + ex.getMessage());
@@ -171,6 +175,8 @@ public class CoreController {
         if (!StopPreview) {
             return Result.formatToPojo(400,"停止失败");
         }
+        deviclist.setIsrunmp4(0);
+        deviclistImpl.updateDeviclist(deviclist);
         return Result.formatToPojo(200,true);
     }
 
@@ -213,6 +219,7 @@ public class CoreController {
             deviclist.setStreampath(stream);
             long pid = (long)m3u8.get("pid");
             deviclist.setPid((int) pid);
+            deviclist.setIsrunstream(1);
             boolean b = deviclistImpl.updateDeviclist(deviclist);
             if (!b)
                 log.error("添加推流地址失败");
@@ -235,6 +242,8 @@ public class CoreController {
             Deviclist deviclist = deviclistImpl.queryDeviclistOrderNo(orderNo);
             boolean ffmpegFlag = new FFMpegUtli().stopStream(deviclist);
             if(ffmpegFlag){
+                deviclist.setIsrunstream(0);
+                deviclistImpl.updateDeviclist(deviclist);
                 return Result.formatToPojo(200,true);
             }else {
                 return Result.formatToPojo(400,"停止推流失败");

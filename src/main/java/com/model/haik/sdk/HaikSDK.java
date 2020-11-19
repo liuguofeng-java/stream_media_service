@@ -63,7 +63,7 @@ public class HaikSDK {
                 case 1:
                     log.info("设备退出lUserID:" + lUserID);
                     //添加设备信息
-                    return true /*deviceQuit(lUserID.intValue())*/;
+                    return deviceQuit(lUserID.intValue());
                 default:
                     log.info("FRegisterCallBack default type:" + dwDataType);
                     break;
@@ -257,12 +257,20 @@ public class HaikSDK {
             List<Deviclist> deviclists = deviclistImpl.queryDevicDevicId(devicId);
             boolean flag;
             if(deviclists.size() != 0){
-                flag = deviclistImpl.updateDeviclistAll(deviclists.get(0));
+                Deviclist deviclist = deviclists.get(0);
+                deviclist.setLuserid(luserID);
+                deviclist.setIsdeviceonline(1);
+                devic.setIsrunmp4(0);
+                devic.setIsrunstream(0);
+                flag = deviclistImpl.updateDeviclistAll(deviclist);
             }else {
                 devic.setDevicid(devicId);
                 String format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date());
                 devic.setAddtime(format);
                 devic.setLuserid(luserID);
+                devic.setIsdeviceonline(1);
+                devic.setIsrunmp4(0);
+                devic.setIsrunstream(0);
                 flag = deviclistImpl.insertDeviclist(devic);
             }
             if(!flag){

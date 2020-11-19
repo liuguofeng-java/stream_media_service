@@ -10,10 +10,11 @@
     <result column="OrderNo" property="orderno" jdbcType="VARCHAR" />
     <result column="VideoPath" property="videopath" jdbcType="VARCHAR" />
     <result column="StreamPath" property="streampath" jdbcType="VARCHAR" />
-    <result column="AddTime" property="addtime" jdbcType="VARCHAR" />
     <result column="Pid" property="pid" jdbcType="INTEGER" />
+    <result column="AddTime" property="addtime" jdbcType="VARCHAR" />
     <result column="IsRunMp4" property="isrunmp4" jdbcType="INTEGER" />
     <result column="IsRunStream" property="isrunstream" jdbcType="INTEGER" />
+    <result column="IsDeviceOnLine" property="isdeviceonline" jdbcType="INTEGER" />
   </resultMap>
 
   <delete id="decdeleteTable">
@@ -79,8 +80,8 @@
     </where>
   </sql>
   <sql id="Base_Column_List" >
-    Id, DevicId, LuserID, SessionId, PreviewHandle, OrderNo, VideoPath, StreamPath, AddTime, 
-    Pid, IsRunMp4, IsRunStream
+    Id, DevicId, LuserID, SessionId, PreviewHandle, OrderNo, VideoPath, StreamPath, Pid, 
+    AddTime, IsRunMp4, IsRunStream, IsDeviceOnLine
   </sql>
   <select id="selectByExample" resultMap="BaseResultMap" parameterType="com.model.pojo.DeviclistExample" >
     select
@@ -115,14 +116,14 @@
   <insert id="insert" parameterType="com.model.pojo.Deviclist" >
     insert into devicList (Id, DevicId, LuserID, 
       SessionId, PreviewHandle, OrderNo, 
-      VideoPath, StreamPath, AddTime, 
-      Pid, IsRunMp4, IsRunStream
-      )
+      VideoPath, StreamPath, Pid, 
+      AddTime, IsRunMp4, IsRunStream, 
+      IsDeviceOnLine)
     values (#{id,jdbcType=INTEGER}, #{devicid,jdbcType=VARCHAR}, #{luserid,jdbcType=INTEGER}, 
       #{sessionid,jdbcType=INTEGER}, #{previewhandle,jdbcType=INTEGER}, #{orderno,jdbcType=VARCHAR}, 
-      #{videopath,jdbcType=VARCHAR}, #{streampath,jdbcType=VARCHAR}, #{addtime,jdbcType=VARCHAR}, 
-      #{pid,jdbcType=INTEGER}, #{isrunmp4,jdbcType=INTEGER}, #{isrunstream,jdbcType=INTEGER}
-      )
+      #{videopath,jdbcType=VARCHAR}, #{streampath,jdbcType=VARCHAR}, #{pid,jdbcType=INTEGER}, 
+      #{addtime,jdbcType=VARCHAR}, #{isrunmp4,jdbcType=INTEGER}, #{isrunstream,jdbcType=INTEGER}, 
+      #{isdeviceonline,jdbcType=INTEGER})
   </insert>
   <insert id="insertSelective" parameterType="com.model.pojo.Deviclist" >
     insert into devicList
@@ -151,17 +152,20 @@
       <if test="streampath != null" >
         StreamPath,
       </if>
-      <if test="addtime != null" >
-        AddTime,
-      </if>
       <if test="pid != null" >
         Pid,
+      </if>
+      <if test="addtime != null" >
+        AddTime,
       </if>
       <if test="isrunmp4 != null" >
         IsRunMp4,
       </if>
       <if test="isrunstream != null" >
         IsRunStream,
+      </if>
+      <if test="isdeviceonline != null" >
+        IsDeviceOnLine,
       </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides="," >
@@ -189,17 +193,20 @@
       <if test="streampath != null" >
         #{streampath,jdbcType=VARCHAR},
       </if>
-      <if test="addtime != null" >
-        #{addtime,jdbcType=VARCHAR},
-      </if>
       <if test="pid != null" >
         #{pid,jdbcType=INTEGER},
+      </if>
+      <if test="addtime != null" >
+        #{addtime,jdbcType=VARCHAR},
       </if>
       <if test="isrunmp4 != null" >
         #{isrunmp4,jdbcType=INTEGER},
       </if>
       <if test="isrunstream != null" >
         #{isrunstream,jdbcType=INTEGER},
+      </if>
+      <if test="isdeviceonline != null" >
+        #{isdeviceonline,jdbcType=INTEGER},
       </if>
     </trim>
   </insert>
@@ -236,17 +243,20 @@
       <if test="record.streampath != null" >
         StreamPath = #{record.streampath,jdbcType=VARCHAR},
       </if>
-      <if test="record.addtime != null" >
-        AddTime = #{record.addtime,jdbcType=VARCHAR},
-      </if>
       <if test="record.pid != null" >
         Pid = #{record.pid,jdbcType=INTEGER},
+      </if>
+      <if test="record.addtime != null" >
+        AddTime = #{record.addtime,jdbcType=VARCHAR},
       </if>
       <if test="record.isrunmp4 != null" >
         IsRunMp4 = #{record.isrunmp4,jdbcType=INTEGER},
       </if>
       <if test="record.isrunstream != null" >
         IsRunStream = #{record.isrunstream,jdbcType=INTEGER},
+      </if>
+      <if test="record.isdeviceonline != null" >
+        IsDeviceOnLine = #{record.isdeviceonline,jdbcType=INTEGER},
       </if>
     </set>
     <if test="_parameter != null" >
@@ -263,10 +273,11 @@
       OrderNo = #{record.orderno,jdbcType=VARCHAR},
       VideoPath = #{record.videopath,jdbcType=VARCHAR},
       StreamPath = #{record.streampath,jdbcType=VARCHAR},
-      AddTime = #{record.addtime,jdbcType=VARCHAR},
       Pid = #{record.pid,jdbcType=INTEGER},
+      AddTime = #{record.addtime,jdbcType=VARCHAR},
       IsRunMp4 = #{record.isrunmp4,jdbcType=INTEGER},
-      IsRunStream = #{record.isrunstream,jdbcType=INTEGER}
+      IsRunStream = #{record.isrunstream,jdbcType=INTEGER},
+      IsDeviceOnLine = #{record.isdeviceonline,jdbcType=INTEGER}
     <if test="_parameter != null" >
       <include refid="Update_By_Example_Where_Clause" />
     </if>
@@ -295,17 +306,20 @@
       <if test="streampath != null" >
         StreamPath = #{streampath,jdbcType=VARCHAR},
       </if>
-      <if test="addtime != null" >
-        AddTime = #{addtime,jdbcType=VARCHAR},
-      </if>
       <if test="pid != null" >
         Pid = #{pid,jdbcType=INTEGER},
+      </if>
+      <if test="addtime != null" >
+        AddTime = #{addtime,jdbcType=VARCHAR},
       </if>
       <if test="isrunmp4 != null" >
         IsRunMp4 = #{isrunmp4,jdbcType=INTEGER},
       </if>
       <if test="isrunstream != null" >
         IsRunStream = #{isrunstream,jdbcType=INTEGER},
+      </if>
+      <if test="isdeviceonline != null" >
+        IsDeviceOnLine = #{isdeviceonline,jdbcType=INTEGER},
       </if>
     </set>
     where Id = #{id,jdbcType=INTEGER}
@@ -319,10 +333,11 @@
       OrderNo = #{orderno,jdbcType=VARCHAR},
       VideoPath = #{videopath,jdbcType=VARCHAR},
       StreamPath = #{streampath,jdbcType=VARCHAR},
-      AddTime = #{addtime,jdbcType=VARCHAR},
       Pid = #{pid,jdbcType=INTEGER},
+      AddTime = #{addtime,jdbcType=VARCHAR},
       IsRunMp4 = #{isrunmp4,jdbcType=INTEGER},
-      IsRunStream = #{isrunstream,jdbcType=INTEGER}
+      IsRunStream = #{isrunstream,jdbcType=INTEGER},
+      IsDeviceOnLine = #{isdeviceonline,jdbcType=INTEGER}
     where Id = #{id,jdbcType=INTEGER}
   </update>
 </mapper>

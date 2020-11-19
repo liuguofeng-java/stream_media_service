@@ -82,23 +82,13 @@ public class DeviclistImpl implements DeviclistDao {
     @Override
     public boolean deleteLuserID(Integer luserID) {
         Deviclist deviclist = queryLuserID(luserID);//查询是否存在
-        if(deviclist != null &&deviclist.getVideopath() == null){//如果没有保存MP4就删除
-            DeviclistExample example = new DeviclistExample();
-            DeviclistExample.Criteria criteria = example.createCriteria();
-            criteria.andLuseridEqualTo(luserID);
-            int i = deviclistMapper.deleteByExample(example);
-            return i > 0;
-        }else if(deviclist != null ){
-            deviclist.setLuserid(null);
-            deviclist.setDevicid(null);
-
-            DeviclistExample example = new DeviclistExample();
-            DeviclistExample.Criteria criteria = example.createCriteria();
-            criteria.andIdEqualTo(deviclist.getId());
-            int i = deviclistMapper.updateByExample(deviclist, example);
-            return i > 0;
-        }
-        return false;
+        Deviclist device = new Deviclist();
+        device.setDevicid(deviclist.getDevicid());
+        device.setLuserid(deviclist.getLuserid());
+        device.setIsdeviceonline(0);
+        device.setIsrunmp4(0);
+        device.setIsrunstream(0);
+        return updateDeviclistAll(deviclist);
     }
 
     @Override
@@ -141,7 +131,8 @@ public class DeviclistImpl implements DeviclistDao {
         Deviclist device = new Deviclist();
         device.setDevicid(deviclist.getDevicid());
         device.setLuserid(deviclist.getLuserid());
-        int flag = deviclistMapper.updateByExample(deviclist, example);
+        device.setIsdeviceonline(deviclist.getIsdeviceonline());
+        int flag = deviclistMapper.updateByExample(device, example);
         return flag > 0;
     }
 }

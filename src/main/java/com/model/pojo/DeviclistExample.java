@@ -624,6 +624,66 @@ public class DeviclistExample {
             return (Criteria) this;
         }
 
+        public Criteria andPidIsNull() {
+            addCriterion("Pid is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andPidIsNotNull() {
+            addCriterion("Pid is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andPidEqualTo(Integer value) {
+            addCriterion("Pid =", value, "pid");
+            return (Criteria) this;
+        }
+
+        public Criteria andPidNotEqualTo(Integer value) {
+            addCriterion("Pid <>", value, "pid");
+            return (Criteria) this;
+        }
+
+        public Criteria andPidGreaterThan(Integer value) {
+            addCriterion("Pid >", value, "pid");
+            return (Criteria) this;
+        }
+
+        public Criteria andPidGreaterThanOrEqualTo(Integer value) {
+            addCriterion("Pid >=", value, "pid");
+            return (Criteria) this;
+        }
+
+        public Criteria andPidLessThan(Integer value) {
+            addCriterion("Pid <", value, "pid");
+            return (Criteria) this;
+        }
+
+        public Criteria andPidLessThanOrEqualTo(Integer value) {
+            addCriterion("Pid <=", value, "pid");
+            return (Criteria) this;
+        }
+
+        public Criteria andPidIn(List<Integer> values) {
+            addCriterion("Pid in", values, "pid");
+            return (Criteria) this;
+        }
+
+        public Criteria andPidNotIn(List<Integer> values) {
+            addCriterion("Pid not in", values, "pid");
+            return (Criteria) this;
+        }
+
+        public Criteria andPidBetween(Integer value1, Integer value2) {
+            addCriterion("Pid between", value1, value2, "pid");
+            return (Criteria) this;
+        }
+
+        public Criteria andPidNotBetween(Integer value1, Integer value2) {
+            addCriterion("Pid not between", value1, value2, "pid");
+            return (Criteria) this;
+        }
+
         public Criteria andAddtimeIsNull() {
             addCriterion("AddTime is null");
             return (Criteria) this;
@@ -691,66 +751,6 @@ public class DeviclistExample {
 
         public Criteria andAddtimeNotBetween(String value1, String value2) {
             addCriterion("AddTime not between", value1, value2, "addtime");
-            return (Criteria) this;
-        }
-
-        public Criteria andPidIsNull() {
-            addCriterion("Pid is null");
-            return (Criteria) this;
-        }
-
-        public Criteria andPidIsNotNull() {
-            addCriterion("Pid is not null");
-            return (Criteria) this;
-        }
-
-        public Criteria andPidEqualTo(Integer value) {
-            addCriterion("Pid =", value, "pid");
-            return (Criteria) this;
-        }
-
-        public Criteria andPidNotEqualTo(Integer value) {
-            addCriterion("Pid <>", value, "pid");
-            return (Criteria) this;
-        }
-
-        public Criteria andPidGreaterThan(Integer value) {
-            addCriterion("Pid >", value, "pid");
-            return (Criteria) this;
-        }
-
-        public Criteria andPidGreaterThanOrEqualTo(Integer value) {
-            addCriterion("Pid >=", value, "pid");
-            return (Criteria) this;
-        }
-
-        public Criteria andPidLessThan(Integer value) {
-            addCriterion("Pid <", value, "pid");
-            return (Criteria) this;
-        }
-
-        public Criteria andPidLessThanOrEqualTo(Integer value) {
-            addCriterion("Pid <=", value, "pid");
-            return (Criteria) this;
-        }
-
-        public Criteria andPidIn(List<Integer> values) {
-            addCriterion("Pid in", values, "pid");
-            return (Criteria) this;
-        }
-
-        public Criteria andPidNotIn(List<Integer> values) {
-            addCriterion("Pid not in", values, "pid");
-            return (Criteria) this;
-        }
-
-        public Criteria andPidBetween(Integer value1, Integer value2) {
-            addCriterion("Pid between", value1, value2, "pid");
-            return (Criteria) this;
-        }
-
-        public Criteria andPidNotBetween(Integer value1, Integer value2) {
-            addCriterion("Pid not between", value1, value2, "pid");
             return (Criteria) this;
         }
 
@@ -871,6 +871,66 @@ public class DeviclistExample {
 
         public Criteria andIsrunstreamNotBetween(Integer value1, Integer value2) {
             addCriterion("IsRunStream not between", value1, value2, "isrunstream");
+            return (Criteria) this;
+        }
+
+        public Criteria andIsdeviceonlineIsNull() {
+            addCriterion("IsDeviceOnLine is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andIsdeviceonlineIsNotNull() {
+            addCriterion("IsDeviceOnLine is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andIsdeviceonlineEqualTo(Integer value) {
+            addCriterion("IsDeviceOnLine =", value, "isdeviceonline");
+            return (Criteria) this;
+        }
+
+        public Criteria andIsdeviceonlineNotEqualTo(Integer value) {
+            addCriterion("IsDeviceOnLine <>", value, "isdeviceonline");
+            return (Criteria) this;
+        }
+
+        public Criteria andIsdeviceonlineGreaterThan(Integer value) {
+            addCriterion("IsDeviceOnLine >", value, "isdeviceonline");
+            return (Criteria) this;
+        }
+
+        public Criteria andIsdeviceonlineGreaterThanOrEqualTo(Integer value) {
+            addCriterion("IsDeviceOnLine >=", value, "isdeviceonline");
+            return (Criteria) this;
+        }
+
+        public Criteria andIsdeviceonlineLessThan(Integer value) {
+            addCriterion("IsDeviceOnLine <", value, "isdeviceonline");
+            return (Criteria) this;
+        }
+
+        public Criteria andIsdeviceonlineLessThanOrEqualTo(Integer value) {
+            addCriterion("IsDeviceOnLine <=", value, "isdeviceonline");
+            return (Criteria) this;
+        }
+
+        public Criteria andIsdeviceonlineIn(List<Integer> values) {
+            addCriterion("IsDeviceOnLine in", values, "isdeviceonline");
+            return (Criteria) this;
+        }
+
+        public Criteria andIsdeviceonlineNotIn(List<Integer> values) {
+            addCriterion("IsDeviceOnLine not in", values, "isdeviceonline");
+            return (Criteria) this;
+        }
+
+        public Criteria andIsdeviceonlineBetween(Integer value1, Integer value2) {
+            addCriterion("IsDeviceOnLine between", value1, value2, "isdeviceonline");
+            return (Criteria) this;
+        }
+
+        public Criteria andIsdeviceonlineNotBetween(Integer value1, Integer value2) {
+            addCriterion("IsDeviceOnLine not between", value1, value2, "isdeviceonline");
             return (Criteria) this;
         }
     }
